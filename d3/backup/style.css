@@ -1,0 +1,16 @@
+
+svg {
+    background: green;
+}
+
+/* axis styling */
+.axis path,
+.axis line {
+    fill: none;
+    stroke: black;
+    shape-rendering: crispEdges;
+}
+
+.axis text {
+    font-size:12px;
+}

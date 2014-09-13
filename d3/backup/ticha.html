@@ -1,0 +1,169 @@
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>Fan Speed vs Temperature</title>
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="http://d3js.org/colorbrewer.v1.min.js"></script>
+    <style type="text/css">
+      body {
+        font: 13px sans-serif;
+      }
+      .axis path,
+      .axis line {
+        fill: none;
+        stroke: #000;
+        shape-rendering: crispEdges;
+      }
+
+      .outer {
+          width: 1000px;
+          height: 1850px;
+          overflow: auto;
+      }
+      .inner {
+          width: 1000px;
+          height: 1850px;
+      }
+
+      .tooltip {
+        position: absolute;
+        width: 120px;
+        height: 50px;
+        background-color: #595959; 
+        color: #FFFFFF;
+        padding: 8px;
+        border-radius: 8px;   
+        pointer-events: none;
+      }
+
+      .legend {
+              padding: 5px;
+              font: 10px sans-serif;
+              background: yellow;
+              box-shadow: 2px 2px 1px #888;
+      }
+
+      svg {
+        display: block;
+        width: 100%;
+        height: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="outer">
+    <div class="inner">
+        <svg></svg>
+    </div>
+</div>
+    <script type="text/javascript">
+      var countdata = [[22, 0, 14], [22, 4740, 14], [22, 4800, 16], [22, 4860, 7], [22, 4920, 18], [22, 4980, 15], [22, 5040, 6], [22, 5100, 14], [22, 5160, 23], [22, 5220, 34], [22, 5400, 16], [22, 5460, 20], [22, 5520, 6], [22, 5820, 7], [22, 5880, 7], [22, 6000, 7], [23, 0, 14], [23, 4920, 11], [23, 4980, 13], [23, 5040, 21], [23, 5100, 7], [23, 5160, 16], [23, 5220, 23], [23, 5340, 14], [23, 5400, 22], [23, 5460, 19], [23, 5520, 1], [23, 5700, 38], [23, 5760, 4], [23, 7020, 4], [23, 7080, 10], [23, 7140, 5], [23, 7200, 2], [24, 0, 77], [24, 4500, 4], [24, 4560, 10], [24, 4740, 20], [24, 4800, 30], [24, 4860, 111], [24, 4920, 69], [24, 4980, 21], [24, 5040, 28], [24, 5100, 68], [24, 5160, 53], [24, 5220, 56], [24, 5280, 119], [24, 5340, 73], [24, 5400, 63], [24, 5460, 83], [24, 5520, 50], [24, 5580, 22], [24, 5640, 16], [24, 5700, 18], [24, 5760, 24], [24, 6360, 21], [24, 6600, 7], [24, 6660, 19], [24, 6720, 2], [24, 6780, 7], [24, 6900, 13], [24, 6960, 9], [24, 7020, 13], [24, 7080, 13], [24, 7140, 1], [25, 0, 119], [25, 4800, 61], [25, 4860, 48], [25, 4920, 28], [25, 4980, 57], [25, 5040, 24], [25, 5100, 48], [25, 5160, 67], [25, 5220, 104], [25, 5280, 62], [25, 5340, 117], [25, 5400, 48], [25, 5460, 22], [25, 5520, 14], [25, 5580, 14], [25, 5640, 14], [25, 6120, 8], [25, 6180, 20], [25, 6240, 14], [25, 6540, 14], [25, 6600, 16], [25, 6660, 32], [25, 6720, 15], [25, 6780, 7], [25, 6840, 14], [25, 6900, 7], [25, 6960, 31], [25, 7020, 4], [25, 7080, 6], [25, 7140, 1], [26, 0, 210], [26, 5820, 7], [26, 5880, 7], [26, 6000, 7], [26, 6480, 42], [26, 6540, 63], [26, 6600, 29], [26, 6660, 37], [26, 6720, 20], [26, 6780, 82], [26, 6840, 80], [26, 6900, 63], [26, 6960, 33], [26, 7020, 55], [26, 7080, 65], [26, 7140, 16], [26, 7200, 24], [27, 0, 119], [27, 4860, 4], [27, 4920, 3], [27, 5040, 6], [27, 5100, 6], [27, 5160, 2], [27, 6120, 2], [27, 6180, 26], [27, 6540, 21], [27, 6600, 7], [27, 6660, 21], [27, 6720, 37], [27, 6780, 36], [27, 6840, 18], [27, 6900, 2], [27, 6960, 25], [27, 7020, 28], [27, 7080, 39], [27, 7140, 2], [27, 7200, 2], [27, 7320, 14], [28, 0, 35], [28, 6600, 9], [28, 6660, 19], [28, 6900, 35], [28, 7020, 14], [28, 7140, 14], [28, 7200, 12], [28, 7260, 1]];
+
+      //Width and height of the graph
+      var w = 800;
+      var h = 1850;
+      var padding = 80;
+      var xScale = d3.scale.linear()
+                 .domain([d3.min(countdata, function(d) { return d[0]; })-2, 
+                          d3.max(countdata, function(d) { return d[0]; })])
+                 .range([padding, w - padding*(2/3)]);
+
+      var yScale = d3.scale.linear()
+                 .domain([d3.min(countdata, function(d) { return d[1]; }), 
+                          d3.max(countdata, function(d) { return d[1]; })+200])
+                 .range([h - padding, padding]);
+
+      var rScale = d3.scale.linear()
+                 .domain([0, d3.max(countdata, function(d) { return d[1]; })])
+                 .range([2, 5]);
+      var xAxis = d3.svg.axis().scale(xScale).orient("bottom");
+      var yAxis = d3.svg.axis().scale(yScale).orient("left");
+
+      var tooltip = d3.select("body").append("div")   
+          .attr("class", "tooltip")               
+          .style("opacity", 0);
+
+      //Create scale functions
+
+      var cValue = function(d) { return d[2];};
+
+      var color = d3.scale.quantize()
+                    .domain([d3.min(countdata, function(d) { return d[2]; }), 
+                          d3.max(countdata, function(d) { return d[2]; })*0.75])
+                    .range(colorbrewer.BuPu[9]);
+
+      var colors = [ ["sense0", '#377EB8' ], ["sense1", "#4DAF4A"] ];
+
+      //Create SVG element
+      var svg2 = d3.select('svg')
+            .append("svg")
+            .append("g")
+            .attr("width", w)
+            .attr("height", h);
+      var svg = d3.select('svg')
+            .append("svg")
+            .append("g")
+            .attr("width", w)
+            .attr("height", h);
+
+      // bg
+      svg2.append("rect")
+          .attr("width", "100%")
+          .attr("height", "100%")
+          .attr("fill", "#DEDCD9");
+
+      // x-axis 
+      svg2.append("g")
+          .attr("class", "axis")
+          .attr("transform", "translate(0," + (h - padding) + ")")
+          .call(xAxis)
+        .append("text")
+          .attr("class", "label")
+          .attr("x", w-padding)
+          .attr("y", padding/2)
+          .style("text-anchor", "end")
+          .text("Temperature");
+      // y-axis
+      svg2.append("g")
+          .attr("class", "axis")
+          .attr("transform", "translate(" + padding + ",0)")
+          .call(yAxis)
+        .append("text")
+          .attr("class", "label")
+          .attr("transform", "rotate(-90)")
+          .attr("x", -padding)
+          .attr("y", 16)
+          .style("text-anchor", "end")
+          .text("Fan Speed");
+      
+      // circles 
+      svg.selectAll("circle")
+         .data(countdata)
+         .enter()
+         .append("circle")
+         .attr("cx", function(d) {return xScale(d[0]);})
+         .attr("cy", function(d) {return yScale(d[1]);})
+         .attr("r", 6)
+         .on("mouseover", function(d) {      
+            tooltip.transition()        
+                .duration(200)      
+                .style("opacity", .9);      
+            tooltip .html("Temperature: " + d[0] + 
+                          "<br/>"  + "Fan Speed: " + d[1] +
+                          "<br/>" + "Count: " + d[2])  
+                .style("left", (d3.event.pageX) + "px")     
+                .style("top", (d3.event.pageY - 58) + "px");    
+            })                  
+          .on("mouseout", function(d) {       
+              tooltip.transition()        
+                  .duration(500)      
+                  .style("opacity", 0);   
+          })
+          .style("fill", function(d) { return color(cValue(d));});
+  
+
+    </script>
+  </body>
+</html>

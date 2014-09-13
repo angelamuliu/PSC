@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+
+<head>
+    <meta charset="utf-8">
+    <title>D3 Test</title>
+    <script src="d3.js"></script>
+    <script src="jquery-1.11.1.js"></script>
+    <script src="voronoi.js"></script>
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body>
+    <p>
+        <h3>Generate new Kmeans analysis files:</h3>
+        <form action="http://localhost/cgi-bin/parsecaller.py" method="post">
+            Server:
+            <select name="server">
+                <option value="sense0">Sense 0</option>
+                <option value="sense1">Sense 1</option>
+                <option value="sense2">Sense 2</option>
+                <option value="sense3">Sense 3</option>
+                <option value="sense4">Sense 4</option>
+                <option value="sense5">Sense 5</option>
+                <option value="sense6">Sense 6</option>
+            </select><br />
+            Start date (yyyy-mm-dd): <input type="date" name="start_date"><br />
+            End date (yyyy-mm-dd): <input type="date" name="end_date">
+            <input type="submit" value="submit" />
+            <input type="reset" value="clear" />
+        </form>
+    </p>
+    
+    <hr />
+    
+    <p>
+        <h3>Dimension information:</h3>
+        <ul>
+            <li>Filewrites: # of files written to the archiver</li>
+            <li>Filereads: # of files read from the archiver</li>
+            <li>CPU: Averaged CPU for a server (i.e. sense0)</li>
+            <li>diskIOBW: Disk input output bandwidth for a server (i.e. sense0)</li>
+            <li>net bytes: For a server (i.e. sense0)</li>
+        </ul>
+    </p>
+    <form>
+    <strong>Select x value:</strong>
+    <select id="xSelect">
+        <option value=0>filereads</option>
+        <option value=1>filewrites</option>
+        <option value=2>CPU</option>
+        <option value=3>diskIOBW</option>
+        <option value=4>net bytes</option>
+    </select><br />
+    <strong>Select y value:</strong>
+    <select id="ySelect">
+        <option value=0>filereads</option>
+        <option value=1>filewrites</option>
+        <option value=2>CPU</option>
+        <option value=3>diskIOBW</option>
+        <option value=4>net bytes</option>
+    </select>
+    <input type="button" value="Submit" onclick="changeView()">
+    </form>
+    
+    <div id="kmeans-vis"></div>
+    
+</body>
